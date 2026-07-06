@@ -1,0 +1,13 @@
+{
+  "users": [
+    {
+      "id": "58e51aa975c6e1d5",
+      "email": "himanshu.12323930@lpu.in",
+      "name": "Himanshu",
+      "passwordHash": "17ab23537052b4d432ababb901de85d2fe12c392ebecf7e659dbd19bdf38feb6b2773d95718bc4e61be1562b6a47d548dddeb0aa1eb69fa9551e1e9277894a72",
+      "salt": "d788bc400f79c9add62dba7cb3c2c665",
+      "createdAt": "2026-07-06T11:19:21.446Z"
+    }
+  ],
+  "searches": []
+}

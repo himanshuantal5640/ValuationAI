@@ -4,6 +4,7 @@ import Auth from './pages/Auth';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Architecture from './pages/Architecture';
+import Profile from './pages/Profile';
 import WorkflowTimeline from './components/WorkflowTimeline';
 import { analyzeCompanyStream, fetchHistory } from './services/api';
 import { MOCK_HISTORY } from './services/mockData';
@@ -185,7 +186,7 @@ function App() {
 
       {/* PERSISTENT SIDEBAR - DESKTOP */}
       {showSidebar && (
-        <aside className="w-64 bg-gray-950/80 backdrop-blur-md border-r border-white/5 shrink-0 flex flex-col justify-between hidden md:flex sticky top-0 h-screen z-40">
+        <aside className="w-64 bg-gray-950/80 backdrop-blur-md border-r border-white/5 flex flex-col justify-between hidden md:flex fixed top-0 left-0 bottom-0 z-40">
           <div className="flex-1 flex flex-col overflow-y-auto">
             {/* Brand Logo */}
             <div 
@@ -275,14 +276,24 @@ function App() {
             </div>
           </div>
 
-          {/* User Footer Panel with Logout */}
+          {/* User Footer Panel with Profile Card & Logout */}
           <div className="p-4 border-t border-white/5 flex flex-col gap-2">
             {user ? (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 px-2 text-xs text-gray-400 truncate">
-                  <FiUser className="shrink-0" />
-                  <span className="truncate">{user.email}</span>
-                </div>
+                <button
+                  onClick={() => setView('profile')}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-left transition-all border cursor-pointer ${
+                    view === 'profile'
+                      ? 'bg-violet-600 border-violet-500 text-white font-semibold shadow-lg shadow-violet-600/15'
+                      : 'glass-input border-white/5 text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <FiUser className="shrink-0 text-sm" />
+                  <div className="truncate flex-1">
+                    <p className="font-semibold truncate leading-tight text-gray-200">{user.name || "My Account"}</p>
+                    <p className="text-[10px] text-gray-500 truncate mt-0.5">{user.email}</p>
+                  </div>
+                </button>
                 <button
                   onClick={handleLogOut}
                   className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-950/20 border border-red-500/10 hover:bg-red-500/10 text-xs font-semibold text-red-400 cursor-pointer transition-colors btn-shine"
@@ -302,8 +313,8 @@ function App() {
         </aside>
       )}
 
-      {/* MOBILE HEADER */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* MOBILE HEADER & CONTENT PANEL */}
+      <div className={`flex-1 flex flex-col min-w-0 ${showSidebar ? 'md:pl-64' : ''}`}>
         {showSidebar && (
           <header className="h-16 border-b border-white/5 bg-gray-950/50 backdrop-blur-md flex items-center justify-between px-4 md:hidden sticky top-0 z-40 w-full">
             <div onClick={handleBackToHome} className="flex items-center gap-2 cursor-pointer">
@@ -500,6 +511,23 @@ function App() {
                 className="w-full"
               >
                 <Architecture />
+              </motion.div>
+            )}
+
+            {view === 'profile' && (
+              <motion.div
+                key="profile"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <Profile 
+                  user={user} 
+                  history={history} 
+                  onBack={handleBackToHome} 
+                  onSelectDossier={(item) => selectHistoryItem(item)}
+                />
               </motion.div>
             )}
           </AnimatePresence>
