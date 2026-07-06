@@ -61,11 +61,23 @@ function App() {
     }
   }, [user]);
 
+  // Global Auth Guard: if user is not logged in, restrict views to 'landing' or 'auth'
+  useEffect(() => {
+    if (!user && view !== 'landing' && view !== 'auth') {
+      setView('landing');
+    }
+  }, [user, view]);
+
   // Handle URL query parameters for sharing
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const companyParam = params.get('company');
     if (companyParam && history.length > 0) {
+      // Guard: prompt login before allowing report views via share links
+      if (!user) {
+        setView('auth');
+        return;
+      }
       const match = history.find(
         h => h.company.toLowerCase() === companyParam.trim().toLowerCase()
       );
@@ -76,7 +88,7 @@ function App() {
         handleSearch(companyParam.trim());
       }
     }
-  }, [history]);
+  }, [history, user]);
 
   const handleSearch = (companyName, preloadedData = null) => {
     setCurrentCompany(companyName);
