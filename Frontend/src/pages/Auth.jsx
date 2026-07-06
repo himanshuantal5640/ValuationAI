@@ -40,7 +40,10 @@ export default function Auth({ onAuthSuccess, onBackToLanding }) {
       }
     } catch (err) {
       console.error(err);
-      setErrorMsg(err.response?.data?.error || "Authentication failed. Please verify credentials.");
+      const fallback = isLogin 
+        ? "Access denied. Please check your email and password." 
+        : "Registration failed. This email address might already be registered.";
+      setErrorMsg(err.response?.data?.error || fallback);
     } finally {
       setLoading(false);
     }
