@@ -6,7 +6,8 @@ import {
   FiSmile, FiHelpCircle, FiHexagon, FiShield, FiZap, FiGrid
 } from 'react-icons/fi';
 import CircularScore from '../components/CircularScore';
-import html2pdf from 'html2pdf.js';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas-pro';
 
 export default function Dashboard({ data, onBack }) {
   const [copied, setCopied] = useState(false);
@@ -86,30 +87,41 @@ ${data.reasoning}
     setExporting(true);
     const element = document.getElementById('report-dashboard-capture');
     
-    const opt = {
-      margin:       [8, 8, 8, 8],
-      filename:     `${data.company}_Valuation_Report.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { 
-        scale: 2, 
-        useCORS: true, 
-        backgroundColor: '#030712',
-        logging: false
-      },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+    html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#030712',
+      logging: false,
+    })
+    .then((canvas) => {
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
 
-    html2pdf()
-      .from(element)
-      .set(opt)
-      .save()
-      .then(() => {
-        setExporting(false);
-      })
-      .catch((err) => {
-        console.error("PDF generation failed:", err);
-        setExporting(false);
-      });
+      // Add first page
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add subsequent pages if canvas height exceeds A4 height
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save(`${data.company}_Valuation_Report.pdf`);
+      setExporting(false);
+    })
+    .catch((err) => {
+      console.error("PDF generation failed:", err);
+      setExporting(false);
+    });
   };
 
   const getRecStyles = (recText) => {
