@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { loginUser, signupUser } from '../services/api';
-import { FiTrendingUp, FiMail, FiLock, FiAlertCircle, FiLoader } from 'react-icons/fi';
+import { FiTrendingUp, FiMail, FiLock, FiAlertCircle, FiLoader, FiUser, FiEye, FiEyeOff } from 'react-icons/fi';
 
 export default function Auth({ onAuthSuccess, onBackToLanding }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -14,7 +16,7 @@ export default function Auth({ onAuthSuccess, onBackToLanding }) {
     e.preventDefault();
     setErrorMsg('');
     
-    if (!email || !password) {
+    if (!email || !password || (!isLogin && !name)) {
       setErrorMsg("Please fill out all fields.");
       return;
     }
@@ -31,7 +33,7 @@ export default function Auth({ onAuthSuccess, onBackToLanding }) {
         const data = await loginUser(email, password);
         onAuthSuccess(data.user);
       } else {
-        const data = await signupUser(email, password);
+        await signupUser(email, password, name);
         // Automatically log in the user upon successful signup
         const loginData = await loginUser(email, password);
         onAuthSuccess(loginData.user);
@@ -80,6 +82,24 @@ export default function Auth({ onAuthSuccess, onBackToLanding }) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Full Name input (Signup only) */}
+          {!isLogin && (
+            <div className="space-y-1">
+              <label className="text-xs text-gray-400 font-semibold">Full Name</label>
+              <div className="relative flex items-center">
+                <FiUser className="absolute left-3.5 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full bg-black/40 border border-white/10 focus:border-violet-500/50 rounded-lg text-sm px-10 py-3 text-white placeholder-gray-600 focus:outline-none transition-all"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Email input */}
           <div className="space-y-1">
             <label className="text-xs text-gray-400 font-semibold">Email Address</label>
@@ -102,21 +122,28 @@ export default function Auth({ onAuthSuccess, onBackToLanding }) {
             <div className="relative flex items-center">
               <FiLock className="absolute left-3.5 text-gray-500" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-black/40 border border-white/10 focus:border-violet-500/50 rounded-lg text-sm px-10 py-3 text-white placeholder-gray-600 focus:outline-none transition-all"
+                className="w-full bg-black/40 border border-white/10 focus:border-violet-500/50 rounded-lg text-sm px-10 py-3 text-white placeholder-gray-600 focus:outline-none transition-all pr-10"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 text-gray-500 hover:text-gray-300 focus:outline-none cursor-pointer flex items-center"
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
             </div>
           </div>
 
-          {/* Submit button */}
+          {/* Submit button with btn-shine class */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:bg-violet-800 disabled:cursor-not-allowed font-bold text-sm text-white shadow-lg shadow-violet-600/10 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 mt-6"
+            className="w-full py-3 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:bg-violet-800 disabled:cursor-not-allowed font-bold text-sm text-white shadow-lg shadow-violet-600/10 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 mt-6 btn-shine"
           >
             {loading ? (
               <>

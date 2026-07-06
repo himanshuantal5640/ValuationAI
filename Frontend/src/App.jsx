@@ -285,7 +285,7 @@ function App() {
                 </div>
                 <button
                   onClick={handleLogOut}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-950/20 border border-red-500/10 hover:bg-red-500/10 text-xs font-semibold text-red-400 cursor-pointer transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-950/20 border border-red-500/10 hover:bg-red-500/10 text-xs font-semibold text-red-400 cursor-pointer transition-colors btn-shine"
                 >
                   <FiLogOut /> Log Out
                 </button>
@@ -293,7 +293,7 @@ function App() {
             ) : (
               <button
                 onClick={() => setView('auth')}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white cursor-pointer transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white cursor-pointer transition-colors btn-shine"
               >
                 <FiLogIn /> Sign In to Terminal
               </button>

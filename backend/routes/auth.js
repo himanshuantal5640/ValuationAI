@@ -5,10 +5,10 @@ const router = express.Router();
 
 // POST /api/auth/signup
 router.post('/signup', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email and password are required." });
+  if (!email || !password || !name) {
+    return res.status(400).json({ error: "Name, email, and password are required." });
   }
 
   if (password.length < 6) {
@@ -16,7 +16,7 @@ router.post('/signup', (req, res) => {
   }
 
   try {
-    const newUser = db.users.create(email, password);
+    const newUser = db.users.create(email, password, name);
     return res.status(201).json({ 
       message: "Registration successful.", 
       user: newUser 

@@ -190,14 +190,14 @@ ${data.reasoning}
         <div className="flex items-center gap-3 self-end sm:self-auto">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg glass-input text-xs font-semibold text-gray-300 hover:text-white transition-all cursor-pointer hover:bg-white/5 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg glass-input text-xs font-semibold text-gray-300 hover:text-white transition-all cursor-pointer hover:bg-white/5 active:scale-95 btn-shine"
           >
             {copied ? <><FiCheck className="text-emerald-400" /> Copied!</> : <><FiCopy /> Copy Markdown</>}
           </button>
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg glass-input text-xs font-semibold text-gray-300 hover:text-white transition-all cursor-pointer hover:bg-white/5 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg glass-input text-xs font-semibold text-gray-300 hover:text-white transition-all cursor-pointer hover:bg-white/5 active:scale-95 btn-shine"
           >
             {shared ? <><FiCheck className="text-emerald-400" /> Link Copied!</> : <><FiShare2 /> Share Report</>}
           </button>
@@ -205,7 +205,7 @@ ${data.reasoning}
           <button
             onClick={handleExportPDF}
             disabled={exporting}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:bg-violet-800 disabled:cursor-not-allowed text-xs font-semibold text-white transition-all cursor-pointer shadow-lg shadow-violet-500/20 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:bg-violet-800 disabled:cursor-not-allowed text-xs font-semibold text-white transition-all cursor-pointer shadow-lg shadow-violet-500/20 active:scale-95 btn-shine"
           >
             <FiDownload />
             {exporting ? "Compiling PDF..." : "Export PDF"}

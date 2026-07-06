@@ -61,7 +61,7 @@ export const db = {
       const dbData = loadDb();
       return dbData.users.find(u => u.id === id);
     },
-    create: (email, password) => {
+    create: (email, password, name = "") => {
       const dbData = loadDb();
       const existing = dbData.users.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (existing) {
@@ -72,6 +72,7 @@ export const db = {
       const newUser = {
         id: crypto.randomBytes(8).toString('hex'),
         email: email.toLowerCase(),
+        name: name.trim(),
         passwordHash: hash,
         salt: salt,
         createdAt: new Date().toISOString()
@@ -81,7 +82,7 @@ export const db = {
       saveDb(dbData);
       
       // Return user without credentials
-      return { id: newUser.id, email: newUser.email, createdAt: newUser.createdAt };
+      return { id: newUser.id, email: newUser.email, name: newUser.name, createdAt: newUser.createdAt };
     }
   },
   searches: {

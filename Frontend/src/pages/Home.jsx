@@ -85,7 +85,7 @@ export default function Home({ onSearch, history }) {
               <button
                 type="submit"
                 disabled={!query.trim()}
-                className="bg-violet-600 hover:bg-violet-500 text-white font-semibold text-sm px-6 py-3 rounded-lg cursor-pointer transition-all active:scale-95 disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed shrink-0"
+                className="bg-violet-600 hover:bg-violet-500 text-white font-semibold text-sm px-6 py-3 rounded-lg cursor-pointer transition-all active:scale-95 disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed shrink-0 btn-shine"
               >
                 Analyze Company
               </button>

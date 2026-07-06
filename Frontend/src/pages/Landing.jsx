@@ -63,7 +63,7 @@ export default function Landing({ onLaunch, isLoggedIn }) {
           >
             <button
               onClick={onLaunch}
-              className="px-8 py-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 hover:from-violet-500 hover:to-fuchsia-400 text-white font-bold text-base cursor-pointer shadow-lg shadow-violet-500/30 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
+              className="px-8 py-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 hover:from-violet-500 hover:to-fuchsia-400 text-white font-bold text-base cursor-pointer shadow-lg shadow-violet-500/30 flex items-center gap-2 transition-all hover:scale-105 active:scale-95 btn-shine"
             >
               <span>{isLoggedIn ? "Open Research Terminal" : "Get Started Free"}</span>
               <FiChevronRight />
@@ -191,7 +191,7 @@ export default function Landing({ onLaunch, isLoggedIn }) {
                 <li className="flex items-center gap-2">✗ PDF Exporter</li>
               </ul>
             </div>
-            <button onClick={onLaunch} className="w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 text-xs font-bold mt-8 cursor-pointer transition-all">
+            <button onClick={onLaunch} className="w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 text-xs font-bold mt-8 cursor-pointer transition-all btn-shine">
               Launch Free Sandbox
             </button>
           </div>
@@ -210,7 +210,7 @@ export default function Landing({ onLaunch, isLoggedIn }) {
                 <li className="flex items-center gap-2">✓ Persistent Local History</li>
               </ul>
             </div>
-            <button onClick={onLaunch} className="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-xs font-bold text-white mt-8 cursor-pointer transition-all shadow-md shadow-violet-600/10">
+            <button onClick={onLaunch} className="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-xs font-bold text-white mt-8 cursor-pointer transition-all shadow-md shadow-violet-600/10 btn-shine">
               Get Started Pro
             </button>
           </div>
@@ -228,7 +228,7 @@ export default function Landing({ onLaunch, isLoggedIn }) {
                 <li className="flex items-center gap-2">✓ On-premise deployments</li>
               </ul>
             </div>
-            <button onClick={onLaunch} className="w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 text-xs font-bold mt-8 cursor-pointer transition-all">
+            <button onClick={onLaunch} className="w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 text-xs font-bold mt-8 cursor-pointer transition-all btn-shine">
               Contact Desk
             </button>
           </div>
