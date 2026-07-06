@@ -5,15 +5,16 @@ Valuation.AI is an institutional-grade, multi-stage equity research platform pow
 ---
 
 ## Overview
-Valuation.AI allows users to enter a company name (e.g., Nvidia, Tesla, Apple) and receive a comprehensive, real-time AI-generated investment recommendation. Rather than relying on a single, generic LLM prompt, the system deploys a state-managed orchestrator to pipeline requests sequentially across 5 specialized agents. 
+Valuation.AI allows users to register, sign in to their private terminal, enter a company name (e.g., Nvidia, Tesla, Apple) and receive a comprehensive, real-time AI-generated investment recommendation. Rather than relying on a single, generic LLM prompt, the system deploys a state-managed orchestrator to pipeline requests sequentially across 5 specialized agents. 
 
 The frontend shows a live execution log of the active agent node (Researching ➔ News Gathering ➔ Risk Analysis ➔ SWOT Synthesis ➔ Decision Modeling) and renders a glassmorphic dashboard featuring:
 - **Decision Verdict**: Dynamic grading (**Strong Invest**, **Invest**, **Watchlist**, or **Pass**) represented by customized neon-glowing gauges.
 - **SWOT Quadrants**: 4-panel analysis grid breaking down internal factors and external drivers.
 - **Attribution Timeline**: Verified news events complete with publisher sources, dates, and summaries to prevent hallucinations.
 - **Explainability Panel**: Granular explanations of the assigned score and risk weights.
-- **Value Investor Perspective**: A Warren Buffett-style value thesis checking corporate moats and margins of safety.
-- **SaaS Sidebar & PDF Exporter**: High-fidelity PDF downloads and a persistent navigation panel storing LocalStorage analysis logs.
+- **Value Investor Perspective**: A Warren Buffett-style value thesis checking moats and safety margins.
+- **SaaS Sidebar & PDF Exporter**: High-fidelity PDF downloads (supporting modern oklch colors) and a persistent navigation panel storing private history logs.
+- **Multi-User SaaS Architecture**: Users must register or log in to unlock the Search Terminal, caching search queries and reports directly to their private account.
 
 ---
 
@@ -25,7 +26,7 @@ Navigate to the `backend/` directory and configure the environment:
 cd backend
 cp .env.example .env
 ```
-Open `backend/.env` and input your API keys:
+Populate the keys:
 ```env
 PORT=5000
 OPENROUTER_API_KEY=your_openrouter_api_key
@@ -44,7 +45,7 @@ The server will boot on `http://localhost:5000`.
 ### 3. Start the Frontend Application
 In a separate terminal window, open the frontend directory:
 ```bash
-cd Frontend
+cd ../Frontend
 npm install
 npm run dev
 ```
@@ -71,22 +72,26 @@ Requests progress through a sequential, state-managed execution graph built usin
 4. **Investment Analyst Agent**: Synthesizes the dossiers and compiles a structured 4-quadrant SWOT matrix.
 5. **Decision Board Agent**: Determines category scores (out of 100 total), generates transparent rationales, and writes a Warren Buffett value-investing thesis.
 
-### Real-Time Streaming
-Instead of keeping the user waiting for a single long HTTP request, the backend router `/api/analyze/stream` flushes updates in real-time as NDJSON (JSON Lines) chunks. The client reads the stream using the browser's native `ReadableStream` reader, ticking off completed nodes and logging active text outputs in the UI.
+### Real-Time Streaming & History Caching
+Instead of keeping the user waiting for a single long HTTP request, the backend router `/api/analyze/stream` flushes updates in real-time as NDJSON (JSON Lines) chunks. The client reads the stream using the browser's native `ReadableStream` reader, ticking off completed nodes and logging active text outputs in the UI. Upon completion, the result is saved to the private user account in `backend/data/db.json` and loads in their history sidebar.
 
 ---
 
 ## Key Decisions & Trade-Offs
 
-### 1. Sequential Chaining vs. Parallel Processing
+### 1. Zero-Dependency JSON File Database
+- **Decision**: Implemented a local file-based database service (`backend/services/db.js`) saving to a JSON ledger (`backend/data/db.json`).
+- **Trade-Off**: Using a full-scale SQL database (like PostgreSQL) or a NoSQL database (like MongoDB) would require recruiters to install external database servers or configure complex connection strings. Furthermore, packages like `sqlite3` or `bcrypt` frequently crash during installation on Windows due to native C++ compiler dependency mismatches. Selecting a pure-JavaScript JSON-file database wrapper with native `crypto` PBKDF2 hashing ensures zero-friction local installation for the evaluator.
+
+### 2. Sequential Chaining vs. Parallel Processing
 - **Decision**: Chained the agents sequentially: `Research ➔ News ➔ Risks ➔ SWOT ➔ Decision`.
 - **Trade-Off**: Chaining takes ~12-15 seconds to execute because each agent awaits the output of the prior node. However, this ensures absolute context integrity (e.g., the Risk Agent evaluates the *actual* news collected by the News Agent, and the Decision Agent scores the *actual* SWOT compiled by the Analyst). 
 
-### 2. Token Ceiling Cap (`maxTokens: 2048`)
+### 3. Token Ceiling Cap (`maxTokens: 2048`)
 - **Decision**: Explicitly limited the LLM completions to `2048` max tokens inside `backend/services/llm.js`.
 - **Trade-Off**: By default, the LangChain OpenAI driver requests the model's maximum window size (65,535 tokens). OpenRouter checks if a key has enough funds to cover this worst-case token size. For users with low balances or free tiers, this throws a `402 Payment Required` block. Restricting `maxTokens` to `2048` reduces the required credit check threshold, letting the server run seamlessly on free and low-credit keys.
 
-### 3. PDF Generation: html2canvas-pro Override
+### 4. PDF Generation: html2canvas-pro Override
 - **Decision**: Replaced `html2pdf.js` with `html2canvas-pro` + `jspdf` directly in [Frontend/src/pages/Dashboard.jsx](file:///c:/Users/Himanshu/Desktop/INISDEIIM/Frontend/src/pages/Dashboard.jsx).
 - **Trade-Off**: Tailwind CSS v4 compiles utility classes to modern `oklch()` color codes by default. Standard canvas libraries crash when trying to parse `oklch` strings inside style rules. Moving to `html2canvas-pro` (which natively parses modern CSS color specs) resolves this, ensuring high-fidelity dashboard screenshots are generated without style loss or crashes.
 
@@ -145,7 +150,7 @@ Below is the structured output format returned by the Decision agent:
 
 ---
 
-## What You Would Improve with More Time
+## What We Would Improve with More Time
 
 1. **Parallel Graph Branching**: Modify the LangGraph definition to run the `Research Agent` and `News Agent` in parallel, combining their state channels in a subsequent compiler node. This would reduce analysis latency by ~35%.
 2. **Retrieval-Augmented Generation (RAG)**: Connect the agents to a vector database loaded with SEC filings (10-K, 10-Q reports). This would supplement public web results with structured corporate disclosure data.

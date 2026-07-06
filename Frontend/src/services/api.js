@@ -1,15 +1,41 @@
 import axios from 'axios';
 
+// Login User
+export const loginUser = async (email, password) => {
+  const response = await axios.post('/api/auth/login', { email, password });
+  return response.data;
+};
+
+// Signup User
+export const signupUser = async (email, password) => {
+  const response = await axios.post('/api/auth/signup', { email, password });
+  return response.data;
+};
+
+// Fetch Search History from database
+export const fetchHistory = async (userId) => {
+  const response = await axios.get('/api/history', {
+    headers: { 'x-user-id': userId }
+  });
+  return response.data;
+};
+
 // Synchronous POST request
-export const analyzeCompanySync = async (company) => {
-  const response = await axios.post('/api/analyze', { company });
+export const analyzeCompanySync = async (company, userId = null) => {
+  const headers = userId ? { 'x-user-id': userId } : {};
+  const response = await axios.post('/api/analyze', { company }, { headers });
   return response.data;
 };
 
 // Streaming request parsing JSON Lines
-export const analyzeCompanyStream = async (company, { onStatus, onResult, onError, onComplete }) => {
+export const analyzeCompanyStream = async (company, { onStatus, onResult, onError, onComplete, userId = null }) => {
   try {
-    const response = await fetch(`/api/analyze/stream?company=${encodeURIComponent(company)}`);
+    let url = `/api/analyze/stream?company=${encodeURIComponent(company)}`;
+    if (userId) {
+      url += `&userId=${encodeURIComponent(userId)}`;
+    }
+    
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Server returned error: ${response.status} ${response.statusText}`);
     }

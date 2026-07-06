@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react';
+import Landing from './pages/Landing';
+import Auth from './pages/Auth';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Architecture from './pages/Architecture';
 import WorkflowTimeline from './components/WorkflowTimeline';
-import { analyzeCompanyStream } from './services/api';
+import { analyzeCompanyStream, fetchHistory } from './services/api';
 import { MOCK_HISTORY } from './services/mockData';
 import { 
   FiTrendingUp, FiActivity, FiAlertCircle, FiSearch, 
-  FiCpu, FiClock, FiFileText, FiChevronRight, FiMenu, FiX 
+  FiCpu, FiClock, FiFileText, FiChevronRight, FiMenu, FiX, 
+  FiUser, FiLogOut, FiLogIn
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
-  const [view, setView] = useState('home'); // 'home' | 'loading' | 'result' | 'architecture'
+  const [view, setView] = useState('landing'); // 'landing' | 'auth' | 'home' | 'loading' | 'result' | 'architecture'
+  const [user, setUser] = useState(null);
   const [currentCompany, setCurrentCompany] = useState('');
   const [currentStep, setCurrentStep] = useState('research');
   const [logs, setLogs] = useState([]);
@@ -21,20 +25,41 @@ function App() {
   const [errorMsg, setErrorMsg] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Load history from LocalStorage or seed with MOCK_HISTORY
+  // Load session from LocalStorage on load
   useEffect(() => {
-    const saved = localStorage.getItem('investment_agent_history');
-    if (saved) {
+    const savedUser = localStorage.getItem('valuation_ai_user');
+    if (savedUser) {
       try {
-        setHistory(JSON.parse(saved));
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        setView('home');
       } catch (e) {
-        setHistory(MOCK_HISTORY);
+        localStorage.removeItem('valuation_ai_user');
+        setView('landing');
       }
     } else {
-      setHistory(MOCK_HISTORY);
-      localStorage.setItem('investment_agent_history', JSON.stringify(MOCK_HISTORY));
+      setView('landing');
     }
   }, []);
+
+  // Fetch history for the logged-in user or fallback to seed mocks
+  const loadUserHistory = async (userId) => {
+    try {
+      const data = await fetchHistory(userId);
+      setHistory(data.length > 0 ? data : MOCK_HISTORY);
+    } catch (e) {
+      console.warn("Failed to load history from database, falling back to mocks.", e);
+      setHistory(MOCK_HISTORY);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadUserHistory(user.id);
+    } else {
+      setHistory(MOCK_HISTORY);
+    }
+  }, [user]);
 
   // Handle URL query parameters for sharing
   useEffect(() => {
@@ -74,6 +99,7 @@ function App() {
     window.history.pushState({}, '', `?company=${encodeURIComponent(companyName)}`);
 
     analyzeCompanyStream(companyName, {
+      userId: user ? user.id : null,
       onStatus: (status) => {
         if (status.node.includes('research')) {
           setCurrentStep('research');
@@ -90,13 +116,10 @@ function App() {
       },
       onResult: (resultData) => {
         setAnalysisResult(resultData);
-        
-        setHistory(prev => {
-          const filtered = prev.filter(h => h.company.toLowerCase() !== resultData.company.toLowerCase());
-          const updated = [resultData, ...filtered];
-          localStorage.setItem('investment_agent_history', JSON.stringify(updated));
-          return updated;
-        });
+        // Reload user history from database to refresh sidebar
+        if (user) {
+          loadUserHistory(user.id);
+        }
       },
       onError: (err) => {
         console.error("Stream analysis error:", err);
@@ -113,16 +136,33 @@ function App() {
   };
 
   const handleBackToHome = () => {
-    setView('home');
+    setView(user ? 'home' : 'landing');
     setAnalysisResult(null);
     setCurrentCompany('');
     setMobileMenuOpen(false);
     window.history.pushState({}, '', window.location.pathname);
   };
 
+  const handleAuthSuccess = (loggedUser) => {
+    setUser(loggedUser);
+    localStorage.setItem('valuation_ai_user', JSON.stringify(loggedUser));
+    setView('home');
+  };
+
+  const handleLogOut = () => {
+    setUser(null);
+    localStorage.removeItem('valuation_ai_user');
+    setView('landing');
+    setAnalysisResult(null);
+    setCurrentCompany('');
+    window.history.pushState({}, '', window.location.pathname);
+  };
+
   const selectHistoryItem = (item) => {
     handleSearch(item.company, item);
   };
+
+  const showSidebar = view !== 'landing' && view !== 'auth';
 
   return (
     <div className="flex min-h-screen text-gray-100 bg-[#030712] font-sans relative overflow-x-hidden">
@@ -132,124 +172,149 @@ function App() {
       <div className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] bg-emerald-950/10 rounded-full blur-3xl pointer-events-none z-0" />
 
       {/* PERSISTENT SIDEBAR - DESKTOP */}
-      <aside className="w-64 bg-gray-950/80 backdrop-blur-md border-r border-white/5 shrink-0 flex flex-col justify-between hidden md:flex sticky top-0 h-screen z-40">
-        <div className="flex-1 flex flex-col overflow-y-auto">
-          {/* Brand Logo */}
-          <div 
-            onClick={handleBackToHome}
-            className="h-16 px-6 flex items-center gap-2 border-b border-white/5 cursor-pointer hover:bg-white/2"
-          >
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <FiTrendingUp className="text-white text-sm" />
-            </div>
-            <span className="font-extrabold text-sm tracking-wider bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              VALUATION.<span className="text-violet-400 font-black">AI</span>
-            </span>
-          </div>
-
-          {/* Primary Navigation */}
-          <nav className="p-4 space-y-1">
-            <button
+      {showSidebar && (
+        <aside className="w-64 bg-gray-950/80 backdrop-blur-md border-r border-white/5 shrink-0 flex flex-col justify-between hidden md:flex sticky top-0 h-screen z-40">
+          <div className="flex-1 flex flex-col overflow-y-auto">
+            {/* Brand Logo */}
+            <div 
               onClick={handleBackToHome}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                view === 'home' 
-                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/15' 
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
+              className="h-16 px-6 flex items-center gap-2 border-b border-white/5 cursor-pointer hover:bg-white/2"
             >
-              <FiSearch />
-              <span>Search Terminal</span>
-            </button>
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                <FiTrendingUp className="text-white text-sm" />
+              </div>
+              <span className="font-extrabold text-sm tracking-wider bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                VALUATION.<span className="text-violet-400 font-black">AI</span>
+              </span>
+            </div>
 
-            <button
-              onClick={() => { setView('architecture'); setMobileMenuOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                view === 'architecture' 
-                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/15' 
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <FiCpu />
-              <span>System Topology</span>
-            </button>
-
-            {analysisResult && (
+            {/* Primary Navigation */}
+            <nav className="p-4 space-y-1">
               <button
-                onClick={() => { setView('result'); setMobileMenuOpen(false); }}
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                  view === 'result' 
+                onClick={handleBackToHome}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
+                  view === 'home' 
                     ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/15' 
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <FiFileText />
-                  <span className="truncate max-w-[120px]">{analysisResult.company} Report</span>
-                </div>
-                <FiChevronRight className="text-xs shrink-0" />
+                <FiSearch />
+                <span>Search Terminal</span>
               </button>
-            )}
-          </nav>
 
-          {/* Search History Logs */}
-          <div className="p-4 border-t border-white/5 flex-1">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-1.5 px-3">
-              <FiClock /> Recent Dossiers
-            </div>
-            
-            <div className="space-y-1 overflow-y-auto max-h-[50vh]">
-              {history.map((item, idx) => {
-                const isInvest = item.recommendation && item.recommendation.toLowerCase().includes("invest");
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => selectHistoryItem(item)}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-xs flex flex-col gap-1 cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-gray-300 group-hover:text-white truncate max-w-[130px]">{item.company}</span>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                        isInvest ? 'text-emerald-400 bg-emerald-500/5' : 'text-amber-400 bg-amber-500/5'
-                      }`}>
-                        {item.scores?.total || item.score}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+              <button
+                onClick={() => { setView('architecture'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
+                  view === 'architecture' 
+                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/15' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <FiCpu />
+                <span>System Topology</span>
+              </button>
+
+              {analysisResult && (
+                <button
+                  onClick={() => { setView('result'); setMobileMenuOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
+                    view === 'result' 
+                      ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/15' 
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <FiFileText />
+                    <span className="truncate max-w-[120px]">{analysisResult.company} Report</span>
+                  </div>
+                  <FiChevronRight className="text-xs shrink-0" />
+                </button>
+              )}
+            </nav>
+
+            {/* Search History Logs */}
+            <div className="p-4 border-t border-white/5 flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-1.5 px-3">
+                <FiClock /> Recent Dossiers
+              </div>
+              
+              <div className="space-y-1 overflow-y-auto max-h-[45vh]">
+                {history.map((item, idx) => {
+                  const rec = item.recommendation || item.decision || "Watchlist";
+                  const isInvest = rec.toLowerCase().includes("invest");
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => selectHistoryItem(item)}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-xs flex flex-col gap-1 cursor-pointer group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-gray-300 group-hover:text-white truncate max-w-[130px]">{item.company}</span>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
+                          isInvest ? 'text-emerald-400 bg-emerald-500/5' : 'text-amber-400 bg-amber-500/5'
+                        }`}>
+                          {item.scores?.total || item.score}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* User Footer Panel */}
-        <div className="p-4 border-t border-white/5 text-[10px] text-gray-600 text-center">
-          Agents Active. Ver: 1.2.0
-        </div>
-      </aside>
+          {/* User Footer Panel with Logout */}
+          <div className="p-4 border-t border-white/5 flex flex-col gap-2">
+            {user ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 px-2 text-xs text-gray-400 truncate">
+                  <FiUser className="shrink-0" />
+                  <span className="truncate">{user.email}</span>
+                </div>
+                <button
+                  onClick={handleLogOut}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-950/20 border border-red-500/10 hover:bg-red-500/10 text-xs font-semibold text-red-400 cursor-pointer transition-colors"
+                >
+                  <FiLogOut /> Log Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setView('auth')}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white cursor-pointer transition-colors"
+              >
+                <FiLogIn /> Sign In to Terminal
+              </button>
+            )}
+          </div>
+        </aside>
+      )}
 
       {/* MOBILE HEADER */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-white/5 bg-gray-950/50 backdrop-blur-md flex items-center justify-between px-4 md:hidden sticky top-0 z-40 w-full">
-          <div onClick={handleBackToHome} className="flex items-center gap-2 cursor-pointer">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <FiTrendingUp className="text-white text-sm" />
+        {showSidebar && (
+          <header className="h-16 border-b border-white/5 bg-gray-950/50 backdrop-blur-md flex items-center justify-between px-4 md:hidden sticky top-0 z-40 w-full">
+            <div onClick={handleBackToHome} className="flex items-center gap-2 cursor-pointer">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                <FiTrendingUp className="text-white text-sm" />
+              </div>
+              <span className="font-extrabold text-sm tracking-wider bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                VALUATION.<span className="text-violet-400 font-black">AI</span>
+              </span>
             </div>
-            <span className="font-extrabold text-sm tracking-wider bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              VALUATION.<span className="text-violet-400 font-black">AI</span>
-            </span>
-          </div>
 
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-gray-300 hover:text-white cursor-pointer"
-          >
-            {mobileMenuOpen ? <FiX /> : <FiMenu />}
-          </button>
-        </header>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-gray-300 hover:text-white cursor-pointer"
+            >
+              {mobileMenuOpen ? <FiX /> : <FiMenu />}
+            </button>
+          </header>
+        )}
 
         {/* MOBILE SIDEBAR MENU OVERLAY */}
         <AnimatePresence>
-          {mobileMenuOpen && (
+          {showSidebar && mobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -287,6 +352,20 @@ function App() {
                 )}
               </nav>
 
+              {user && (
+                <div className="border-t border-white/5 pt-3">
+                  <div className="flex items-center gap-2 px-3 mb-3 text-xs text-gray-400 truncate">
+                    <FiUser /> <span>{user.email}</span>
+                  </div>
+                  <button
+                    onClick={handleLogOut}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-950/20 border border-red-500/10 hover:bg-red-500/10 text-xs font-semibold text-red-400 cursor-pointer"
+                  >
+                    <FiLogOut /> Log Out
+                  </button>
+                </div>
+              )}
+
               <div className="border-t border-white/5 pt-3">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2 px-3 flex items-center gap-1.5">
                   <FiClock /> Recent Dossiers
@@ -309,8 +388,38 @@ function App() {
         </AnimatePresence>
 
         {/* MAIN DISPLAY PANEL */}
-        <main className="flex-1 flex flex-col justify-start relative z-10 w-full min-h-[calc(100vh-4rem)] md:min-h-screen">
+        <main className="flex-1 flex flex-col justify-start relative z-10 w-full min-h-screen">
           <AnimatePresence mode="wait">
+            {view === 'landing' && (
+              <motion.div
+                key="landing"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <Landing 
+                  onLaunch={() => setView(user ? 'home' : 'auth')} 
+                  isLoggedIn={!!user} 
+                />
+              </motion.div>
+            )}
+
+            {view === 'auth' && (
+              <motion.div
+                key="auth"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <Auth 
+                  onAuthSuccess={handleAuthSuccess} 
+                  onBackToLanding={() => setView('landing')} 
+                />
+              </motion.div>
+            )}
+
             {view === 'home' && (
               <motion.div
                 key="home"

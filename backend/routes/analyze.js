@@ -1,11 +1,35 @@
 import express from "express";
 import { graph } from "../graph/workflow.js";
+import { db } from "../services/db.js";
 
 const router = express.Router();
+
+// GET /api/history - Retrieve search history for the logged-in user
+router.get("/history", (req, res) => {
+  const userId = req.headers["x-user-id"];
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized. Missing user ID." });
+  }
+  
+  try {
+    const history = db.searches.findByUser(userId);
+    // Map db structure to frontend expected structure
+    const mapped = history.map(item => ({
+      ...item.resultJson,
+      id: item.id,
+      createdAt: item.createdAt
+    }));
+    return res.json(mapped);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 // POST /api/analyze - Standard REST JSON endpoint
 router.post("/analyze", async (req, res) => {
   const { company } = req.body;
+  const userId = req.headers["x-user-id"];
+  
   if (!company) {
     return res.status(400).json({ error: "Company name is required." });
   }
@@ -14,6 +38,9 @@ router.post("/analyze", async (req, res) => {
     console.log(`Starting analysis for ${company}...`);
     const result = await graph.invoke({ company });
     if (result && result.decision) {
+      if (userId) {
+        db.searches.create(userId, company, result.decision);
+      }
       return res.json(result.decision);
     } else {
       return res.status(500).json({ error: "Failed to generate decision.", state: result });
@@ -26,7 +53,7 @@ router.post("/analyze", async (req, res) => {
 
 // GET /api/analyze/stream - Streaming JSON Lines endpoint
 router.get("/analyze/stream", async (req, res) => {
-  const { company } = req.query;
+  const { company, userId } = req.query;
   if (!company) {
     res.status(400).write(JSON.stringify({ type: "error", error: "Company name is required." }) + "\n");
     return res.end();
@@ -44,7 +71,7 @@ router.get("/analyze/stream", async (req, res) => {
   };
 
   try {
-    console.log(`[Stream API] Starting graph stream for ${company}`);
+    console.log(`[Stream API] Starting graph stream for ${company} (User: ${userId || 'Anonymous'})`);
     sendChunk("status", { node: "research_start", message: "Researching Company Overview, Business Model & Market Position..." });
 
     const stream = await graph.stream({ company });
@@ -75,6 +102,16 @@ router.get("/analyze/stream", async (req, res) => {
           node: "decision_complete", 
           message: "✓ Investment Decision Generated." 
         });
+        
+        // Cache result in database if user is authenticated
+        if (userId) {
+          try {
+            db.searches.create(userId, company, chunk.decision_node.decision);
+          } catch (e) {
+            console.error("Failed to save search history:", e);
+          }
+        }
+        
         sendChunk("result", { data: chunk.decision_node.decision });
       }
     }

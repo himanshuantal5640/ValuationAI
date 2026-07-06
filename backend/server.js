@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import analyzeRouter from "./routes/analyze.js";
+import authRouter from "./routes/auth.js";
 
 dotenv.config();
 
@@ -12,13 +13,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  allowedHeaders: ["Content-Type", "Authorization", "Accept", "x-user-id"],
   credentials: true
 }));
 
 app.use(express.json());
 
-// Main analysis route
+// Routes
+app.use("/api/auth", authRouter);
 app.use("/api", analyzeRouter);
 
 // Health check endpoint
