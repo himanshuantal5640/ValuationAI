@@ -12,8 +12,7 @@ const PORT = process.env.PORT || 5000;
 // Enable CORS for frontend Vite dev server and production frontend
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "YOUR_DEPLOYED_FRONTEND_URL" // Replace with your production frontend URL (e.g. "https://your-app.vercel.app")
+  "https://valuation-ai-two.vercel.app/"
 ];
 
 app.use(cors({
