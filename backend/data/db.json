@@ -9,5 +9,117 @@
       "createdAt": "2026-07-06T11:19:21.446Z"
     }
   ],
-  "searches": []
+  "searches": [
+    {
+      "id": "9dc16e1c03eaa01c",
+      "userId": "58e51aa975c6e1d5",
+      "company": "TCS",
+      "recommendation": "Watchlist",
+      "score": 60,
+      "resultJson": {
+        "company": "TCS",
+        "recommendation": "Watchlist",
+        "scores": {
+          "marketPosition": 12,
+          "growthPotential": 12,
+          "financialHealth": 12,
+          "newsSentiment": 9,
+          "competitiveAdvantage": 9,
+          "riskExposure": 6,
+          "total": 60
+        },
+        "overview": "Completed automated research for TCS. Output compilation yielded layout structure errors.",
+        "swot": {
+          "strengths": [
+            "Strong market brand presence.",
+            "High technological core assets.",
+            "Global supply distribution channels."
+          ],
+          "weaknesses": [
+            "Exposure to high valuation volatility.",
+            "Heavy capital expenditures for capacity scaling.",
+            "Intense pricing pressure from competitors."
+          ],
+          "opportunities": [
+            "Expanding into generative AI integrations.",
+            "Increasing presence in global emerging markets.",
+            "Product line diversification."
+          ],
+          "threats": [
+            "Regulatory changes in target sectors.",
+            "Supply chain disruptions.",
+            "Antitrust scrutiny in primary regions."
+          ]
+        },
+        "news": [
+          {
+            "title": "Equity analysis request processed",
+            "summary": "The research pipeline finalized the company news logs.",
+            "source": "System Agent",
+            "date": "6/7/2026"
+          }
+        ],
+        "reasoning": "Synthesis finished successfully, but the LLM output failed JSON formatting. Raw Output Fragment: {\n  \"company\": \"TCS\",\n  \"recommendation\": \"Strong Invest\",\n  \"scores\": {\n    \"marketPosition\": 19,\n    \"growthPotential\": 18,\n    \"financialHealth\": 20,\n    \"newsSentiment\": 14,\n    \"competitiveAdvantage\": 14,\n    \"riskExposure\": 8,\n    \"total\": 93\n  },\n  \"overview\": \"TCS is a global IT services, co...",
+        "whyDecision": {
+          "scoreRationale": "The score was assigned a fallback rating due to response parsing deviations.",
+          "recommendationRationale": "Watchlist rating indicates confirmation is required on raw text transcripts.",
+          "risksRationale": "Competitor and regulatory threat vectors remain high based on raw files."
+        },
+        "buffettPerspective": "Value evaluation of corporate moats was inconclusive due to format anomalies. Buffett would advise waiting for clear, structured corporate disclosures. This perspective is AI-generated and not financial advice."
+      },
+      "createdAt": "2026-07-06T11:24:46.458Z"
+    },
+    {
+      "id": "12a8374095fda1dd",
+      "userId": "58e51aa975c6e1d5",
+      "company": "Amazone",
+      "recommendation": "Invest",
+      "score": 68,
+      "resultJson": {
+        "company": "Amazone",
+        "recommendation": "Invest",
+        "scores": {
+          "marketPosition": 18,
+          "growthPotential": 17,
+          "financialHealth": 16,
+          "newsSentiment": 0,
+          "competitiveAdvantage": 14,
+          "riskExposure": 3,
+          "total": 68
+        },
+        "overview": "Given the complete lack of specific information on 'Amazone' due to 'fetch failed' errors, this investment decision is based on the strong assumption that 'Amazone' is a typo for Amazon.com, Inc. (AMZN). Amazon is a dominant force in e-commerce and cloud computing (AWS), characterized by vast scale, diversified revenue streams, and a relentless focus on innovation.",
+        "swot": {
+          "strengths": [
+            "Dominant Market Share & Brand Recognition: Unrivaled leadership in e-commerce and cloud computing (AWS), coupled with a globally recognized and trusted brand.",
+            "Robust Logistics & Infrastructure: Extensive fulfillment network, last-mile delivery capabilities, and global data center infrastructure (AWS) provide significant operational advantages and cost efficiencies.",
+            "Customer-Centric Innovation & Prime Ecosystem: A relentless focus on customer experience, continuous innovation (e.g., Alexa, Just Walk Out), and the sticky Prime membership program drive loyalty and recurring revenue."
+          ],
+          "weaknesses": [
+            "High Operating Costs & Thin Margins in Retail: The core e-commerce business, while massive, operates on relatively thin margins due to heavy investments in logistics, technology, and competitive pricing.",
+            "Reliance on Third-Party Sellers: While beneficial, dependence on a vast network of third-party sellers introduces quality control challenges, potential for counterfeit goods, and regulatory scrutiny over marketplace practices.",
+            "Workforce Management & Public Perception: Frequent scrutiny over labor practices, warehouse conditions, and unionization efforts can impact public perception and lead to operational disruptions or increased costs."
+          ],
+          "opportunities": [
+            "Expansion into New Geographies & Emerging Markets: Significant runway for growth by expanding its e-commerce and AWS services into underserved or rapidly developing international markets.",
+            "Growth of Cloud Computing (AWS) & AI Integration: Continued secular growth in cloud adoption, coupled with Amazon's leadership in AI/ML, offers substantial opportunities for AWS to expand its services and market share.",
+            "Diversification into New Verticals: Further expansion into high-growth sectors like healthcare (Amazon Pharmacy, One Medical), groceries, advertising, and entertainment provides new revenue streams and market penetration."
+          ],
+          "threats": [
+            "Intensifying Regulatory & Antitrust Scrutiny: Increasing government oversight globally regarding market dominance, data privacy, labor practices, and competitive behavior poses significant legal and financial risks.",
+            "Aggressive Competition Across All Segments: Facing fierce competition from established players (Walmart, Microsoft, Google) and emerging disruptors in e-commerce, cloud, advertising, and new ventures.",
+            "Macroeconomic Headwinds & Consumer Spending Volatility: Economic downturns, inflation, and shifts in consumer spending patterns can directly impact e-commerce sales and advertising revenue."
+          ]
+        },
+        "news": [],
+        "reasoning": "Despite the complete lack of specific data for 'Amazone' and operating under the assumption it refers to Amazon.com, Inc., the company's foundational strengths in market position, growth potential, and competitive advantage are undeniable. AWS continues to be a high-margin engine, and the e-commerce ecosystem, while lower margin, benefits from unparalleled scale and customer loyalty. However, the significant regulatory headwinds, intense competition, and the inherent operational complexities of such a vast enterprise introduce considerable risk. The absence of any news sentiment data due to the 'fetch failed' error also prevents a positive score in that category. Therefore, while a strong company, the current environment and data limitations warrant an 'Invest' rather than 'Strong Invest' recommendation, emphasizing careful monitoring of regulatory developments and competitive pressures.",
+        "whyDecision": {
+          "scoreRationale": "Market Position (18/20): Amazon (assuming AMZN) holds dominant positions in e-commerce and cloud computing, with vast global reach. Growth Potential (17/20): AWS, advertising, and new ventures like healthcare offer substantial future growth, though e-commerce growth may moderate. Financial Health (16/20): Strong revenue generation and cash flow, though retail margins can be thin and heavy investments impact profitability. Recent News Sentiment (0/15): No news data was available due to 'fetch failed' errors, so a neutral/zero score is assigned. Competitive Advantage (14/15): Unparalleled scale, network effects, logistics, and AWS's lead create a formidable moat. Risk Exposure (3/10): Significant regulatory/antitrust scrutiny, intense competition across all segments, and macroeconomic sensitivity represent substantial risks, leading to a low score (high exposure).",
+          "recommendationRationale": "The 'Invest' recommendation stems from a total score of 68. While Amazon's core business and growth engines are robust, the significant regulatory and competitive risks, coupled with the complete absence of recent news sentiment data (due to the 'fetch failed' error), prevent a 'Strong Invest' rating. The company's strengths are compelling, but the external threats and operational complexities require careful consideration.",
+          "risksRationale": "Risk prioritization for 'Amazone' (assuming AMZN) heavily focuses on regulatory and antitrust scrutiny. This is a pervasive and growing threat globally, potentially leading to forced divestitures, fines, or operational restrictions. Competition across all segments (e-commerce, cloud, advertising) is also a critical risk, as rivals continue to innovate and challenge Amazon's dominance. Macroeconomic headwinds, while cyclical, can significantly impact consumer spending and advertising budgets, directly affecting Amazon's top and bottom lines. These risks are substantial and warrant continuous monitoring."
+        },
+        "buffettPerspective": "From a Warren Buffett perspective, 'Amazone' (assuming Amazon) possesses an undeniable economic moat, primarily through its unparalleled scale, network effects in e-commerce, and the dominant, high-margin AWS cloud business. The company's relentless focus on customer satisfaction and long-term investment aligns with a patient capital allocation strategy. However, a value investor might be wary of its often-high valuation, which leaves less margin of safety, and the increasing regulatory scrutiny could pose a significant long-term headwind to its 'forever' business prospects. This is an AI-generated analysis and not financial advice."
+      },
+      "createdAt": "2026-07-07T08:43:56.227Z"
+    }
+  ]
 }

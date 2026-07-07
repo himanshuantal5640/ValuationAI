@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+axios.defaults.baseURL = API_BASE;
+
 // Login User
 export const loginUser = async (email, password) => {
   const response = await axios.post('/api/auth/login', { email, password });
@@ -30,7 +33,7 @@ export const analyzeCompanySync = async (company, userId = null) => {
 // Streaming request parsing JSON Lines
 export const analyzeCompanyStream = async (company, { onStatus, onResult, onError, onComplete, userId = null }) => {
   try {
-    let url = `/api/analyze/stream?company=${encodeURIComponent(company)}`;
+    let url = `${API_BASE}/api/analyze/stream?company=${encodeURIComponent(company)}`;
     if (userId) {
       url += `&userId=${encodeURIComponent(userId)}`;
     }

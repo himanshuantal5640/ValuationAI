@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
-const DATA_DIR = path.resolve('data');
+const DATA_DIR = process.env.DB_DATA_DIR ? path.resolve(process.env.DB_DATA_DIR) : path.resolve('data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 // Ensure database file and directory exist
