@@ -12,14 +12,16 @@ const PORT = process.env.PORT || 5000;
 // Enable CORS for frontend Vite dev server and production frontend
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://valuation-ai-two.vercel.app/"
-];
+  "https://valuation-ai-two.vercel.app"
+].map(url => url.replace(/\/$/, ""));
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, or server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+    
+    const normalizedOrigin = origin.replace(/\/$/, "");
+    if (allowedOrigins.indexOf(normalizedOrigin) !== -1 || allowedOrigins.includes("*")) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
