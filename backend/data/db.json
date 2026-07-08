@@ -120,6 +120,65 @@
         "buffettPerspective": "From a Warren Buffett perspective, 'Amazone' (assuming Amazon) possesses an undeniable economic moat, primarily through its unparalleled scale, network effects in e-commerce, and the dominant, high-margin AWS cloud business. The company's relentless focus on customer satisfaction and long-term investment aligns with a patient capital allocation strategy. However, a value investor might be wary of its often-high valuation, which leaves less margin of safety, and the increasing regulatory scrutiny could pose a significant long-term headwind to its 'forever' business prospects. This is an AI-generated analysis and not financial advice."
       },
       "createdAt": "2026-07-07T08:43:56.227Z"
+    },
+    {
+      "id": "11f809e51f661cbe",
+      "userId": "58e51aa975c6e1d5",
+      "company": "tata",
+      "recommendation": "Watchlist",
+      "score": 60,
+      "resultJson": {
+        "company": "tata",
+        "recommendation": "Watchlist",
+        "scores": {
+          "marketPosition": 12,
+          "growthPotential": 12,
+          "financialHealth": 12,
+          "newsSentiment": 9,
+          "competitiveAdvantage": 9,
+          "riskExposure": 6,
+          "total": 60
+        },
+        "overview": "Completed automated research for tata. Output compilation yielded layout structure errors.",
+        "swot": {
+          "strengths": [
+            "Strong market brand presence.",
+            "High technological core assets.",
+            "Global supply distribution channels."
+          ],
+          "weaknesses": [
+            "Exposure to high valuation volatility.",
+            "Heavy capital expenditures for capacity scaling.",
+            "Intense pricing pressure from competitors."
+          ],
+          "opportunities": [
+            "Expanding into generative AI integrations.",
+            "Increasing presence in global emerging markets.",
+            "Product line diversification."
+          ],
+          "threats": [
+            "Regulatory changes in target sectors.",
+            "Supply chain disruptions.",
+            "Antitrust scrutiny in primary regions."
+          ]
+        },
+        "news": [
+          {
+            "title": "Equity analysis request processed",
+            "summary": "The research pipeline finalized the company news logs.",
+            "source": "System Agent",
+            "date": "8/7/2026"
+          }
+        ],
+        "reasoning": "Synthesis finished successfully, but the LLM output failed JSON formatting. Raw Output Fragment: {\n  \"company\": \"tata\",\n  \"recommendation\": \"Strong Invest\",\n  \"scores\": {\n    \"marketPosition\": 18,\n    \"growthPotential\": 17,\n    \"financialHealth\": 14,\n    \"newsSentiment\": 12,\n    \"competitiveAdvantage\": 14,...",
+        "whyDecision": {
+          "scoreRationale": "The score was assigned a fallback rating due to response parsing deviations.",
+          "recommendationRationale": "Watchlist rating indicates confirmation is required on raw text transcripts.",
+          "risksRationale": "Competitor and regulatory threat vectors remain high based on raw files."
+        },
+        "buffettPerspective": "Value evaluation of corporate moats was inconclusive due to format anomalies. Buffett would advise waiting for clear, structured corporate disclosures. This perspective is AI-generated and not financial advice."
+      },
+      "createdAt": "2026-07-08T17:56:23.859Z"
     }
   ]
 }
