@@ -1,5 +1,7 @@
 # Valuation.AI - Smart AI Investment Research Platform
 
+**Live Link**: [https://valuation-ai-two.vercel.app/](https://valuation-ai-two.vercel.app/)
+
 Valuation.AI is an institutional-grade, multi-stage equity research platform powered by an orchestrating cluster of specialized AI agents. The platform automates corporate analysis, news intelligence parsing, risk evaluation, and investment decision modeling, returning category-graded scores (out of 100) and structured SWOT dossiers in seconds.
 
 ---
